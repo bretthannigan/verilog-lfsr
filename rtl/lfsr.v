@@ -201,8 +201,8 @@ reg [DATA_WIDTH-1:0] lfsr_mask_data[LFSR_WIDTH-1:0];
 reg [LFSR_WIDTH-1:0] output_mask_state[DATA_WIDTH-1:0];
 reg [DATA_WIDTH-1:0] output_mask_data[DATA_WIDTH-1:0];
 
-reg [LFSR_WIDTH-1:0] state_val = 0;
-reg [DATA_WIDTH-1:0] data_val = 0;
+reg [LFSR_WIDTH-1:0] state_val;
+reg [DATA_WIDTH-1:0] data_val;
 
 integer i, j, k;
 
@@ -391,36 +391,38 @@ end else if (STYLE_INT == "LOOP") begin
     // same size as generated code with Quartus
     // --> better for synthesis
 
-    reg [LFSR_WIDTH-1:0] state_out_reg = 0;
-    reg [DATA_WIDTH-1:0] data_out_reg = 0;
+    reg [LFSR_WIDTH-1:0] state_out_reg;
+    reg [DATA_WIDTH-1:0] data_out_reg;
 
     assign state_out = state_out_reg;
     assign data_out = data_out_reg;
 
+    integer l, m;
+
     always @* begin
-        for (i = 0; i < LFSR_WIDTH; i = i + 1) begin
-            state_out_reg[i] = 0;
-            for (j = 0; j < LFSR_WIDTH; j = j + 1) begin
-                if (lfsr_mask_state[i][j]) begin
-                    state_out_reg[i] = state_out_reg[i] ^ state_in[j];
+        for (l = 0; l < LFSR_WIDTH; l = l + 1) begin
+            state_out_reg[l] = 0;
+            for (m = 0; m < LFSR_WIDTH; m = m + 1) begin
+                if (lfsr_mask_state[l][m]) begin
+                    state_out_reg[l] = state_out_reg[l] ^ state_in[m];
                 end
             end
-            for (j = 0; j < DATA_WIDTH; j = j + 1) begin
-                if (lfsr_mask_data[i][j]) begin
-                    state_out_reg[i] = state_out_reg[i] ^ data_in[j];
+            for (m = 0; m < DATA_WIDTH; m = m + 1) begin
+                if (lfsr_mask_data[l][m]) begin
+                    state_out_reg[l] = state_out_reg[l] ^ data_in[m];
                 end
             end
         end
-        for (i = 0; i < DATA_WIDTH; i = i + 1) begin
-            data_out_reg[i] = 0;
-            for (j = 0; j < LFSR_WIDTH; j = j + 1) begin
-                if (output_mask_state[i][j]) begin
-                    data_out_reg[i] = data_out_reg[i] ^ state_in[j];
+        for (l = 0; l < DATA_WIDTH; l = l + 1) begin
+            data_out_reg[l] = 0;
+            for (m = 0; m < LFSR_WIDTH; m = m + 1) begin
+                if (output_mask_state[l][m]) begin
+                    data_out_reg[l] = data_out_reg[l] ^ state_in[m];
                 end
             end
-            for (j = 0; j < DATA_WIDTH; j = j + 1) begin
-                if (output_mask_data[i][j]) begin
-                    data_out_reg[i] = data_out_reg[i] ^ data_in[j];
+            for (m = 0; m < DATA_WIDTH; m = m + 1) begin
+                if (output_mask_data[l][m]) begin
+                    data_out_reg[l] = data_out_reg[l] ^ data_in[m];
                 end
             end
         end
